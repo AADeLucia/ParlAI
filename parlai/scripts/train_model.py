@@ -93,8 +93,9 @@ def setup_args(parser=None) -> ParlaiParser:
     train.add_argument(
         '--overwrite-checkpoints',
         type=bool,
-        default=False,
-        help='Overwrites the checkpoint file for each save (e.g. model_file.checkpoint_0) (default False)',
+        default=True,
+        help='Overwrites the checkpoint file for each save (e.g. model_file.checkpoint instead of '
+             'model_file.checkpoint_0, model_file.checkpoint_1, etc) (default True)',
     )
     train.add_argument(
         '-sval',
