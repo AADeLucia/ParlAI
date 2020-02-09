@@ -91,6 +91,12 @@ def setup_args(parser=None) -> ParlaiParser:
         'every n seconds (default -1, never).',
     )
     train.add_argument(
+        '--overwrite-checkpoints',
+        type=bool,
+        default=False,
+        help='Overwrites the checkpoint file for each save (e.g. model_file.checkpoint_0) (default False)',
+    )
+    train.add_argument(
         '-sval',
         '--save-after-valid',
         type='bool',
@@ -350,6 +356,7 @@ class TrainLoop:
         self.validate_time = Timer()
         self.log_time = Timer()
         self.save_time = Timer()
+        self.checkpoint_counter = 0
         print('[ training... ]')
         self.parleys = 0
         self.max_num_epochs = (
@@ -436,11 +443,14 @@ class TrainLoop:
         fn = self.opt['model_file']
         if suffix:
             fn += suffix
+        if not opt['overwrite_checkpoints']:
+            fn += f'_{self.checkpoint_counter}'
         while True:
             # don't ever let a ctrl-c interrupt saving
             try:
                 self.agent.save(fn)
                 self._save_train_stats(suffix)
+                self.checkpoint_counter += 1
                 break
             except KeyboardInterrupt:
                 pass
@@ -450,6 +460,8 @@ class TrainLoop:
         if suffix:
             fn += suffix
         fn += '.trainstats'
+        if not opt['overwrite_checkpoints']:
+            fn += f'_{self.checkpoint_counter}'
         with open(fn, 'w') as f:
             json.dump(
                 {
