@@ -69,7 +69,7 @@ def setup_args(parser=None):
     )
     parser.add_argument(
         '--world-logs-format',
-        type='str',
+        type=str,
         default='parlai',
         choices=['jsonl', 'parlai', 'forever'],
         help='File format to save chat logs. (default parlai)'
