@@ -67,6 +67,13 @@ def setup_args(parser=None):
         help='Saves a jsonl file containing all of the task examples and '
         'model replies. Must also specify --report-filename.',
     )
+    parser.add_argument(
+        '--world-logs-format',
+        type='str',
+        default='parlai',
+        choices=['jsonl', 'parlai', 'forever'],
+        help='File format to save chat logs. (default parlai)'
+    )
     parser.add_argument('-ltim', '--log-every-n-secs', type=float, default=2)
     parser.set_defaults(interactive_mode=True, task='interactive')
     LocalHumanAgent.add_cmdline_args(parser)
@@ -118,9 +125,8 @@ def interactive(opt, print_parser=None):
                 # dump world acts to file
                 world_logger.reset()  # add final acts to logs
                 base_outfile = opt['report_filename'].split('.')[0]
-                outfile = base_outfile + f'_interactive_replies.jsonl'
-                world_logger.write_jsonl_format(outfile)
-                # world_logger.write_parlai_format(outfile)
+                outfile = base_outfile + f'_interactive_replies.json'
+                world_logger.write(outfile, file_format=opt['world-logs-format'])
             quit()
 
 
