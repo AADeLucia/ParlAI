@@ -150,23 +150,25 @@ class WorldLogger:
         print('[ Saving log to {} in forever chat format ]'.format(outfile))
         with open(outfile, 'w') as of:
             for episode in tqdm(self._logs):
-                chat = {
-                    'sha': None,
-                    'sender': episode.get('id', ''),
-                    'receiver': None,
-                    'is_from_me': False,
-                    'send_error': False,
-                    'date': None,
-                    'service': 'parlai',
-                    'date_read': None,
-                    'date_delivered': None,
-                    'participants': [],
-                    'message_text': episode.get('text', ''),
-                    'message_segments': [],
-                    'attachments': [],
-                    'associated_sha': '',
-                    '_debug': None
-                }
+                # episode = [{human input}, {model response}]
+                for act in episode:
+                    chat = {
+                        'sha': None,
+                        'sender': act.get('id', ''),
+                        'receiver': None,
+                        'is_from_me': False,
+                        'send_error': False,
+                        'date': None,
+                        'service': 'parlai',
+                        'date_read': None,
+                        'date_delivered': None,
+                        'participants': [],
+                        'message_text': act.get('text', ''),
+                        'message_segments': [],
+                        'attachments': [],
+                        'associated_sha': '',
+                        '_debug': None
+                    }
                 json_episode = json.dumps(chat, indent=4)
                 of.write(json_episode + '\n')
 
