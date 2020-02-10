@@ -126,7 +126,7 @@ def interactive(opt, print_parser=None):
                 world_logger.reset()  # add final acts to logs
                 base_outfile = opt['report_filename'].split('.')[0]
                 outfile = base_outfile + f'_interactive_replies.json'
-                world_logger.write(outfile, file_format=opt['world-logs-format'])
+                world_logger.write(outfile, file_format=opt['world_logs_format'])
             quit()
 
 
