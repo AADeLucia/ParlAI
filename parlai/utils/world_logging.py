@@ -149,28 +149,28 @@ class WorldLogger:
     def write_forever_format(self, outfile):
         print('[ Saving log to {} in forever chat format ]'.format(outfile))
         with open(outfile, 'w') as of:
-            for episode in tqdm(self._logs):
-                # episode = [{human input}, {model response}]
-                for act in episode:
+            for episode in tqdm(self._logs[0]):  # Ignore the hack IDK
+                participants = [a.get('id', '') for a in episode]
+                for i, act in enumerate(episode):
                     chat = {
                         'sha': None,
                         'sender': act.get('id', ''),
-                        'receiver': None,
-                        'is_from_me': False,
+                        'receiver': participants[i-1],
+                        'is_from_me': act.get('id', '') == 'localHuman',
                         'send_error': False,
                         'date': None,
                         'service': 'parlai',
                         'date_read': None,
                         'date_delivered': None,
-                        'participants': [],
+                        'participants': participants,
                         'message_text': act.get('text', ''),
                         'message_segments': [],
                         'attachments': [],
                         'associated_sha': '',
                         '_debug': None
                     }
-                json_episode = json.dumps(chat, indent=4)
-                of.write(json_episode + '\n')
+                    json_episode = json.dumps(chat, indent=4)
+                    of.write(json_episode + '\n')
 
     def write(self, outfile, file_format='jsonl'):
         if file_format == 'jsonl':
