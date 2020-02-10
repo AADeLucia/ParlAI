@@ -22,6 +22,7 @@ from parlai.core.params import ParlaiParser
 from parlai.core.agents import create_agent
 from parlai.core.worlds import create_task
 from parlai.agents.local_human.local_human import LocalHumanAgent
+from parlai.utils.world_logging import WorldLogger
 
 import random
 
@@ -50,8 +51,26 @@ def setup_args(parser=None):
         default=True,
         help='Create interactive version of task',
     )
+    parser.add_argument(
+        '-rf',
+        '--report-filename',
+        type=str,
+        default='',
+        help='Saves a json file of the evaluation report either as an '
+        'extension to the model-file (if begins with a ".") or a whole '
+        'file path. Set to the empty string to not save at all.',
+    )
+    parser.add_argument(
+        '--save-world-logs',
+        type='bool',
+        default=False,
+        help='Saves a jsonl file containing all of the task examples and '
+        'model replies. Must also specify --report-filename.',
+    )
+    parser.add_argument('-ltim', '--log-every-n-secs', type=float, default=2)
     parser.set_defaults(interactive_mode=True, task='interactive')
     LocalHumanAgent.add_cmdline_args(parser)
+    WorldLogger.add_cmdline_args(parser)
     return parser
 
 
@@ -78,12 +97,25 @@ def interactive(opt, print_parser=None):
     # Show some example dialogs:
     while True:
         world.parley()
+        if world_logger is not None:
+            world_logger.log(world)
         if opt.get('display_examples'):
             print("---")
             print(world.display())
         if world.epoch_done():
             print("EPOCH DONE")
             break
+
+    report = world.report()
+    world.reset()
+
+    if world_logger is not None:
+        # dump world acts to file
+        world_logger.reset()  # add final acts to logs
+        base_outfile = opt['report_filename'].split('.')[0]
+        outfile = base_outfile + f'_interactive_replies.jsonl'
+        # world_logger.write_jsonl_format(outfile)
+        world_logger.write_parlai_format(outfile)
 
 
 if __name__ == '__main__':
