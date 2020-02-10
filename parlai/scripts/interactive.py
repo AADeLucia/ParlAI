@@ -88,6 +88,8 @@ def interactive(opt, print_parser=None):
     agent = create_agent(opt, requireModelExists=True)
     human_agent = LocalHumanAgent(opt)
     world = create_task(opt, [human_agent, agent])
+    # set up world logger
+    world_logger = WorldLogger(opt) if opt['save_world_logs'] else None
 
     if print_parser:
         # Show arguments after loading model
