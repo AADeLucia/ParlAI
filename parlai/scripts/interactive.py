@@ -98,26 +98,30 @@ def interactive(opt, print_parser=None):
 
     # Show some example dialogs:
     while True:
-        world.parley()
-        if world_logger is not None:
-            world_logger.log(world)
-        if opt.get('display_examples'):
-            print("---")
-            print(world.display())
-        if world.epoch_done():
-            print("EPOCH DONE")
-            break
+        try:
+            world.parley()
+            if opt.get('display_examples'):
+                print("---")
+                print(world.display())
+            if world.epoch_done():
+                print("EPOCH DONE")
+                break
+        except KeyboardInterrupt:
+            if world_logger is not None:
+                print(f"Writing out world log.")
+                world_logger.log(world)
+                # Save report
+                report = world.report()
+                world.reset()
 
-    report = world.report()
-    world.reset()
-
-    if world_logger is not None:
-        # dump world acts to file
-        world_logger.reset()  # add final acts to logs
-        base_outfile = opt['report_filename'].split('.')[0]
-        outfile = base_outfile + f'_interactive_replies.jsonl'
-        # world_logger.write_jsonl_format(outfile)
-        world_logger.write_parlai_format(outfile)
+                if world_logger is not None:
+                    # dump world acts to file
+                    world_logger.reset()  # add final acts to logs
+                    base_outfile = opt['report_filename'].split('.')[0]
+                    outfile = base_outfile + f'_interactive_replies.jsonl'
+                    # world_logger.write_jsonl_format(outfile)
+                    world_logger.write_parlai_format(outfile)
+            quit()
 
 
 if __name__ == '__main__':
